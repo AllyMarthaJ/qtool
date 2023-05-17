@@ -1,4 +1,8 @@
-import { potato } from "./queries/pretty-print";
+import { prettyPrintQuery as pp } from "./queries/pretty-print";
+import { runQuery } from "./query-runner";
 
-console.log(potato);
-console.log("hi");
+const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
+
+const queryResult = runQuery(data, pp);
+
+console.log(queryResult);

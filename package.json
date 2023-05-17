@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/AllyMarthaJ/qtool#readme",
   "dependencies": {
+    "clipboardy": "^3.0.0",
     "tsc": "^2.0.4",
     "typescript": "^5.0.4"
   }
