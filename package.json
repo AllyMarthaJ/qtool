@@ -1,0 +1,23 @@
+{
+  "name": "qtool",
+  "version": "1.0.0",
+  "description": "I work with a stupid amount of JSON and my brain is weird. Let's do what every developer shouldn't and make a tool to help me with my common workflows.",
+  "main": "src/index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AllyMarthaJ/qtool.git"
+  },
+  "author": "Ally",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AllyMarthaJ/qtool/issues"
+  },
+  "homepage": "https://github.com/AllyMarthaJ/qtool#readme",
+  "dependencies": {
+    "tsc": "^2.0.4",
+    "typescript": "^5.0.4"
+  }
+}
