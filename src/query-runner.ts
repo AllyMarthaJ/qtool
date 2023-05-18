@@ -62,7 +62,7 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 	const queryResult = runQuery(data, query);
 
 	if (queryResult.length > 1) {
-		error("too many subquery results");
+		error("Too many Subquery results to parse.");
 	}
 
 	return queryResult[0];
@@ -100,7 +100,9 @@ function handleFetch(data: any, fetch: QueryFetch) {
 	const _for = trySingleResultSubQuery(data, fetch.node);
 
 	if (typeof _for !== "string" && typeof _for !== "number") {
-		error("bad subquery result");
+		error(
+			"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+		);
 	}
 
 	return data[_for];
@@ -108,7 +110,7 @@ function handleFetch(data: any, fetch: QueryFetch) {
 
 function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	if (dig.nodes.length === 0 || seqIndex > dig.nodes.length) {
-		error("can't dig on bad node sequence");
+		error("Bad node sequence; did you forget to dig for something?");
 	}
 
 	if (typeof data !== "object") {
@@ -120,7 +122,9 @@ function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	const _for = trySingleResultSubQuery(data, dig.nodes[seqIndex]);
 
 	if (typeof _for !== "string" && typeof _for !== "number") {
-		error("bad subquery result");
+		error(
+			"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+		);
 	}
 
 	if (data[_for]) {
@@ -162,7 +166,7 @@ function handleGrep(data: any, grep: QueryGrep) {
 			typeof _repl !== "string" ||
 			typeof _flags !== "string"
 		) {
-			error("bad subquery result");
+			error("Subquery returned an unusable result for grepping with.");
 		}
 
 		const regex = new RegExp(_find, _flags);
@@ -181,7 +185,7 @@ function handleContext(data: any, context: QueryContext): any[] {
 			if (Array.isArray(data)) {
 				return [...data];
 			} else {
-				error("not an array");
+				error("Can't enumerate over non-array structure.");
 				return [];
 			}
 		case "data":
@@ -192,7 +196,7 @@ function handleContext(data: any, context: QueryContext): any[] {
 				return [context.value];
 			}
 		default:
-			error("unsupported context");
+			error("Context is unsupported.");
 			return [];
 	}
 }
