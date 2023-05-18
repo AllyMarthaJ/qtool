@@ -7,6 +7,7 @@ export type Query = (
 	| QueryGrep
 	| QueryFetch
 	| QueryDig
+	| QueryCondition
 ) & {
 	dependents?: Query[];
 };
@@ -25,6 +26,13 @@ export type QueryContext = { type: "context" } & (
 			arg: string | number;
 	  }
 );
+
+export type QueryCondition = {
+	type: "conditional";
+	// runQuery will return an array of values
+	// if any of those values are defined, this is truthy
+	query: Query;
+};
 
 export type QueryInterpreter = {
 	type: "interpreter";

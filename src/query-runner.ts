@@ -1,5 +1,6 @@
 import {
 	Query,
+	QueryCondition,
 	QueryContext,
 	QueryDig,
 	QueryFetch,
@@ -26,6 +27,9 @@ export function runQuery(data: any, query: Query): any[] {
 		case "dig":
 			queryResults = [handleDig(data, query)];
 			break;
+		case "conditional":
+			queryResults = [handleConditional(data, query)];
+			break;
 	}
 
 	if (!query.dependents) {
@@ -47,6 +51,14 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 	}
 
 	return queryResult[0];
+}
+
+function handleConditional(data: any, condition: QueryCondition) {
+	const queryConditionalResult = runQuery(data, condition.query);
+
+	if (queryConditionalResult.every((result) => !!result)) {
+		return data;
+	}
 }
 
 function handleFetch(data: any, fetch: QueryFetch) {
