@@ -5,6 +5,7 @@ export type Query = (
 	| QueryContext
 	| QueryInterpreter
 	| QueryGrep
+	| QuerySed
 	| QueryFetch
 	| QueryDig
 	| QueryCondition
@@ -57,6 +58,13 @@ export type QueryInterpreter = {
 
 export type QueryGrep = {
 	type: "grep";
+	find: Query;
+	flags?: Query;
+	all?: boolean;
+};
+
+export type QuerySed = {
+	type: "sed";
 	find: Query;
 	flags?: Query;
 	repl: Query;

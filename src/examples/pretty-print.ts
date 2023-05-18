@@ -15,13 +15,13 @@ export const prettyPrintQuery: Query = parseQuery(data, {
 			interpreter: "string",
 			dependents: [
 				{
-					type: "grep",
+					type: "sed",
 					// prettier-ignore
 					find: strToQuery("[\\[\\]]"),
 					repl: strToQuery(""),
 					dependents: [
 						{
-							type: "grep",
+							type: "sed",
 							find: strToQuery(","),
 							repl: strToQuery("\n"),
 						},

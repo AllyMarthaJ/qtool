@@ -3,7 +3,7 @@ import {
 	QueryContext,
 	QueryDig,
 	QueryFetch,
-	QueryGrep,
+	QuerySed,
 	QueryInterpreter,
 } from "./queries/query";
 import clipboard from "copy-paste";
@@ -24,8 +24,8 @@ export function runQuery(data: any, query: Query): any[] {
 		case "interpreter":
 			queryResults = handleInterpreter(data, query);
 			break;
-		case "grep":
-			queryResults = [handleGrep(data, query)];
+		case "sed":
+			queryResults = [handleSed(data, query)];
 			break;
 		case "fetch":
 			queryResults = [handleFetch(data, query)];
@@ -197,12 +197,12 @@ function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	}
 }
 
-function handleGrep(data: any, grep: QueryGrep) {
+function handleSed(data: any, sed: QuerySed) {
 	if (typeof data === "string") {
-		const _find = trySingleResultSubQuery(data, grep.find);
-		const _repl = trySingleResultSubQuery(data, grep.repl);
-		const _flags = grep.flags
-			? trySingleResultSubQuery(data, grep.flags)
+		const _find = trySingleResultSubQuery(data, sed.find);
+		const _repl = trySingleResultSubQuery(data, sed.repl);
+		const _flags = sed.flags
+			? trySingleResultSubQuery(data, sed.flags)
 			: "g";
 
 		if (
@@ -210,7 +210,7 @@ function handleGrep(data: any, grep: QueryGrep) {
 			typeof _repl !== "string" ||
 			typeof _flags !== "string"
 		) {
-			error("Subquery returned an unusable result for grepping with.");
+			error("Subquery returned an unusable result for sedping with.");
 		}
 
 		const regex = new RegExp(_find, _flags);
