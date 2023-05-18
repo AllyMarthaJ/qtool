@@ -3,9 +3,18 @@ import { Query } from "./query";
 // Demo query
 // ["hello","world","panda","dog"]
 // can be dealt with similar
+
+export function strToQuery(str: string): Query {
+	return {
+		type: "context",
+		context: "literal",
+		value: str,
+	};
+}
+
 export const prettyPrintQuery: Query = {
 	type: "context",
-	context: "clipboard",
+	context: "data",
 	dependents: [
 		{
 			type: "interpreter",
@@ -14,16 +23,13 @@ export const prettyPrintQuery: Query = {
 				{
 					type: "grep",
 					// prettier-ignore
-					find: "[[]]",
-					repl: "",
+					find: strToQuery("[\\[\\]]"),
+					repl: strToQuery(""),
 					dependents: [
 						{
 							type: "grep",
-							find: ",",
-							repl: "\n",
-							dependents: [
-								{ type: "interpreter", interpreter: "generic" },
-							],
+							find: strToQuery(","),
+							repl: strToQuery("\n"),
 						},
 					],
 				},

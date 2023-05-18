@@ -4,7 +4,10 @@
   "description": "I work with a stupid amount of JSON and my brain is weird. Let's do what every developer shouldn't and make a tool to help me with my common workflows.",
   "main": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npx tsc",
+    "run": "npx nodemon build/index.js",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q build/index.js\""
   },
   "repository": {
     "type": "git",
@@ -17,8 +20,13 @@
   },
   "homepage": "https://github.com/AllyMarthaJ/qtool#readme",
   "dependencies": {
-    "clipboardy": "^3.0.0",
-    "tsc": "^2.0.4",
+    "@types/copy-paste": "^1.1.30",
+    "copy-paste": "^1.3.0",
+    "ts-node": "^10.9.1"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.1",
+    "nodemon": "^2.0.22",
     "typescript": "^5.0.4"
   }
 }
