@@ -8,6 +8,7 @@ export type Query = (
 	| QueryFetch
 	| QueryDig
 	| QueryCondition
+	| QueryStackReference
 ) & {
 	dependents?: Query[];
 };
@@ -27,11 +28,18 @@ export type QueryContext = { type: "context" } & (
 	  }
 );
 
+export type QueryStackReference = {
+	// allows recursion by referencing query on the stack
+	type: "stack_query";
+	queryId?: number;
+};
+
 export type QueryCondition = {
 	type: "conditional";
 	// runQuery will return an array of values
 	// if any of those values are defined, this is truthy
 	query: Query;
+	invert?: boolean;
 };
 
 export type QueryInterpreter = {

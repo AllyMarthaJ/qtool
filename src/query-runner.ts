@@ -9,10 +9,14 @@ import {
 } from "./queries/query";
 import clipboard from "copy-paste";
 
+const queryStack: Query[] = [];
+
 export function runQuery(data: any, query: Query): any[] {
 	let queryResults: any[] = [];
 
 	const dependents = handleConditional(data, query);
+
+	queryStack.push(query);
 
 	switch (query.type) {
 		case "context":
@@ -33,17 +37,26 @@ export function runQuery(data: any, query: Query): any[] {
 		case "conditional":
 			queryResults = dependents ? [data] : [];
 			break;
+		case "stack_query":
+			const _query = queryStack[query.queryId ?? 0];
+
+			queryResults = runQuery(data, _query);
+			break;
 	}
 
 	if (!dependents) {
 		return queryResults;
 	}
 
-	return dependents
+	const queryDependentResults = dependents
 		.map((dependent) =>
 			queryResults.map((queryResult) => runQuery(queryResult, dependent))
 		)
 		.flat(2);
+
+	queryStack.pop();
+
+	return queryDependentResults;
 }
 
 function trySingleResultSubQuery(data: any, query: Query): any {
@@ -63,7 +76,7 @@ function handleConditional(data: any, query: Query) {
 
 	const queryConditionalResult = runQuery(data, query.query);
 
-	if (queryConditionalResult.some((result) => !!result)) {
+	if (queryConditionalResult.some((result) => !!result) === !query.invert) {
 		return query.dependents;
 	} else {
 		return;

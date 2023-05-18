@@ -13,13 +13,12 @@ export const ProseMirrorToPlaintext: Query = {
 					type: "conditional",
 					query: {
 						type: "fetch",
-						node: strToQuery("text"), // will be undefined if not found
+						node: strToQuery("text"), // omit from result if not found
 					},
 					dependents: [
 						{
-							type: "context",
-							context: "literal",
-							value: "hey",
+							type: "fetch",
+							node: strToQuery("text"),
 						},
 					],
 				},
@@ -27,7 +26,32 @@ export const ProseMirrorToPlaintext: Query = {
 					type: "conditional",
 					query: {
 						type: "fetch",
-						node: strToQuery("content"), // will be undefined if not found
+						node: strToQuery("text"), // omit from result if not found
+					},
+					invert: true,
+					dependents: [
+						{
+							type: "conditional",
+							query: {
+								type: "fetch",
+								node: strToQuery("content"), // omit from result if not found
+							},
+							invert: true,
+							dependents: [
+								{
+									type: "context",
+									context: "literal",
+									value: " ",
+								},
+							],
+						},
+					],
+				},
+				{
+					type: "conditional",
+					query: {
+						type: "fetch",
+						node: strToQuery("content"), // omit from result if not found
 					},
 					dependents: [
 						{
@@ -40,9 +64,12 @@ export const ProseMirrorToPlaintext: Query = {
 									dependents: [
 										/**need to recurse */
 										{
-											type: "context",
-											context: "literal",
-											value: "hey",
+											type: "stack_query",
+											// context will reset
+											// if queryId 0, causing an
+											// infinite loop due to resetting
+											// context EVERY TIME :sob:
+											queryId: 1,
 										},
 									],
 								},
