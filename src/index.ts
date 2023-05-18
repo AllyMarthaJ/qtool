@@ -1,11 +1,12 @@
 import { dig } from "./queries/dig";
+import { givePanda } from "./queries/give-panda";
 import { prettyPrintQuery as pp } from "./queries/pretty-print";
 import { runQuery } from "./query-runner";
 
-const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
+// const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
 const data2 = '{"baz":{"bar":{"foo":[{"baz":"hi"},{"baz2":"ho"}]}}}';
-
-const queryResult = runQuery(data2, dig);
+const pd = `[{"pandaName":"gary"},{"pandaName":"jerry"},{"pandaName":"ally"}]`;
+const queryResult = runQuery(pd, givePanda);
 
 queryResult.forEach((result) => {
 	console.log("RESULT");

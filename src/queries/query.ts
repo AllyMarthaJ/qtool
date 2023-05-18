@@ -21,7 +21,8 @@ export type QueryContext = { type: "context" } & (
 	  }
 	| {
 			context: "file_path_arg" | "arg";
-			arg: string | number; // support argument notation or index
+			// support index or name
+			arg: string | number;
 	  }
 );
 
