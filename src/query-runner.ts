@@ -1,6 +1,5 @@
 import {
 	Query,
-	QueryCondition,
 	QueryContext,
 	QueryDig,
 	QueryFetch,
@@ -63,10 +62,19 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 	const queryResult = runQuery(data, query);
 
 	if (queryResult.length > 1) {
-		throw "too many subquery results";
+		error("too many subquery results");
 	}
 
 	return queryResult[0];
+}
+
+function error(message: string) {
+	throw {
+		error: message,
+		queryStack: queryStack.map((query) =>
+			JSON.stringify({ ...query, dependents: undefined })
+		),
+	};
 }
 
 function handleConditional(data: any, query: Query) {
@@ -92,7 +100,7 @@ function handleFetch(data: any, fetch: QueryFetch) {
 	const _for = trySingleResultSubQuery(data, fetch.node);
 
 	if (typeof _for !== "string" && typeof _for !== "number") {
-		throw "bad subquery result";
+		error("bad subquery result");
 	}
 
 	return data[_for];
@@ -100,7 +108,7 @@ function handleFetch(data: any, fetch: QueryFetch) {
 
 function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	if (dig.nodes.length === 0 || seqIndex > dig.nodes.length) {
-		throw "can't dig on bad node sequence";
+		error("can't dig on bad node sequence");
 	}
 
 	if (typeof data !== "object") {
@@ -112,7 +120,7 @@ function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	const _for = trySingleResultSubQuery(data, dig.nodes[seqIndex]);
 
 	if (typeof _for !== "string" && typeof _for !== "number") {
-		throw "bad subquery result";
+		error("bad subquery result");
 	}
 
 	if (data[_for]) {
@@ -154,7 +162,7 @@ function handleGrep(data: any, grep: QueryGrep) {
 			typeof _repl !== "string" ||
 			typeof _flags !== "string"
 		) {
-			throw "bad subquery result";
+			error("bad subquery result");
 		}
 
 		const regex = new RegExp(_find, _flags);
@@ -173,7 +181,8 @@ function handleContext(data: any, context: QueryContext): any[] {
 			if (Array.isArray(data)) {
 				return [...data];
 			} else {
-				throw "not an array";
+				error("not an array");
+				return [];
 			}
 		case "data":
 			return [data]; // lol
@@ -183,7 +192,8 @@ function handleContext(data: any, context: QueryContext): any[] {
 				return [context.value];
 			}
 		default:
-			throw "unsupported context";
+			error("unsupported context");
+			return [];
 	}
 }
 
