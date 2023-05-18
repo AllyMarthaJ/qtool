@@ -14,7 +14,7 @@ export const ProseMirrorToPlaintext: Query = {
 		// 	type: "context",
 		// 	context: "data",
 		// },
-		// delimiter: strToQuery(""),
+		// spread: true,
 		on: "string",
 		delimiter: strToQuery(""),
 	},

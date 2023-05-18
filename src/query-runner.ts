@@ -78,6 +78,7 @@ function join(result: any[], query: Query): any[] {
 			return result;
 		case "object":
 			const defaultKeyQuery = query.join.key;
+			const shouldSpread = query.join.spread;
 			return [
 				result.reduce((accum, entry) => {
 					const _for =
@@ -85,9 +86,13 @@ function join(result: any[], query: Query): any[] {
 						trySingleResultSubQuery(entry, defaultKeyQuery);
 
 					if (typeof _for !== "string" && typeof _for !== "number") {
-						error(
-							"Subquery returned an unkeyable result. Try reinterpreting it as a string."
-						);
+						if (shouldSpread) {
+							return { ...accum, ...entry };
+						} else {
+							error(
+								"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+							);
+						}
 					}
 
 					return { ...accum, [_for]: entry };
