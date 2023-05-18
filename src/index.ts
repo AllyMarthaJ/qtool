@@ -1,8 +1,4 @@
-import { dig } from "./queries/dig";
-import { givePanda } from "./queries/give-panda";
-import { ProseMirrorToPlaintext } from "./queries/pm-to-plaintext";
-import { prettyPrintQuery as pp } from "./queries/pretty-print";
-import { throwError } from "./queries/throws-error";
+import { throwError } from "./examples/throws-error";
 import { runQuery } from "./query-runner";
 
 const queryResult = runQuery({}, throwError);

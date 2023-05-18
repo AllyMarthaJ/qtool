@@ -1,5 +1,5 @@
-import { strToQuery } from "./__str_to_query";
-import { Query } from "./query";
+import { strToQuery } from "../queries/__str_to_query";
+import { Query } from "../queries/query";
 
 export const ProseMirrorToPlaintext: Query = {
 	type: "context",

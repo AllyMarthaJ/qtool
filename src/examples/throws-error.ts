@@ -1,5 +1,5 @@
-import { parseQuery } from "./__parse_query";
-import { Query } from "./query";
+import { parseQuery } from "../queries/__parse_query";
+import { Query } from "../queries/query";
 
 // Why does this throw an error?
 // We expect that fetch will only search for one object at

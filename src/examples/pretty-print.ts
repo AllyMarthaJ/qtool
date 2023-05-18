@@ -1,6 +1,6 @@
-import { parseQuery } from "./__parse_query";
-import { Query } from "./query";
-import { strToQuery } from "./__str_to_query";
+import { parseQuery } from "../queries/__parse_query";
+import { strToQuery } from "../queries/__str_to_query";
+import { Query } from "../queries/query";
 
 const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
 

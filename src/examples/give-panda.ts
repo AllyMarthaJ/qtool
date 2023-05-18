@@ -1,6 +1,6 @@
-import { parseQuery } from "./__parse_query";
-import { strToQuery } from "./__str_to_query";
-import { Query } from "./query";
+import { parseQuery } from "../queries/__parse_query";
+import { strToQuery } from "../queries/__str_to_query";
+import { Query } from "../queries/query";
 
 // for example
 const data = `[{"pandaName":"gary"},{"pandaName":"jerry"},{"pandaName":"ally"}]`;
