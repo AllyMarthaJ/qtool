@@ -1,20 +1,10 @@
+import { parseQuery } from "./__parse_query";
 import { Query } from "./query";
+import { strToQuery } from "./__str_to_query";
 
-// Demo query
-// ["hello","world","panda","dog"]
-// can be dealt with similar
+const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
 
-export function strToQuery(str: string): Query {
-	return {
-		type: "context",
-		context: "literal",
-		value: str,
-	};
-}
-
-// const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
-
-export const prettyPrintQuery: Query = {
+export const prettyPrintQuery: Query = parseQuery(data, {
 	type: "context",
 	context: "data",
 	dependents: [
@@ -40,4 +30,4 @@ export const prettyPrintQuery: Query = {
 			],
 		},
 	],
-};
+});

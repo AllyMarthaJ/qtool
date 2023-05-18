@@ -5,9 +5,6 @@ import { prettyPrintQuery as pp } from "./queries/pretty-print";
 import { throwError } from "./queries/throws-error";
 import { runQuery } from "./query-runner";
 
-// const data = `["pandas are","fucking hot","i love them so mucH","pandas<333"]`;
-const data2 = '{"baz":{"bar":{"foo":[{"baz":"hi"},{"baz2":"ho"}]}}}';
-const pd = `[{"pandaName":"gary"},{"pandaName":"jerry"},{"pandaName":"ally"}]`;
 const queryResult = runQuery({}, throwError);
 
 queryResult.forEach((result) => {

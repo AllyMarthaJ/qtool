@@ -1,4 +1,4 @@
-import { strToQuery } from "./pretty-print";
+import { strToQuery } from "./__str_to_query";
 import { Query } from "./query";
 
 export const ProseMirrorToPlaintext: Query = {

@@ -1,11 +1,12 @@
-import { strToQuery } from "./pretty-print";
+import { parseQuery } from "./__parse_query";
+import { strToQuery } from "./__str_to_query";
 import { Query } from "./query";
 
-// const data2 = '{"baz":{"bar":{"foo":[{"baz":"hi"},{"baz2":"ho"}]}}}';
+const data2 = '{"baz":{"bar":{"foo":[{"baz":"hi"},{"baz2":"ho"}]}}}';
 
-export const dig: Query = {
+export const dig: Query = parseQuery(data2, {
 	type: "context",
-	context: "data",
+	context: "data", // noop but good practice
 	dependents: [
 		{
 			type: "interpreter",
@@ -19,4 +20,4 @@ export const dig: Query = {
 			],
 		},
 	],
-};
+});

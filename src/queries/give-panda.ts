@@ -1,11 +1,12 @@
-import { strToQuery } from "./pretty-print";
+import { parseQuery } from "./__parse_query";
+import { strToQuery } from "./__str_to_query";
 import { Query } from "./query";
 
 // for example
-// [{"pandaName":"gary"},{"pandaName":"jerry"},{"pandaName":"ally"}]
-export const givePanda: Query = {
+const data = `[{"pandaName":"gary"},{"pandaName":"jerry"},{"pandaName":"ally"}]`;
+export const givePanda: Query = parseQuery(data, {
 	type: "context",
-	context: "data",
+	context: "data", // i like starting things with 'context' even if this is a noop
 	dependents: [
 		{
 			type: "interpreter",
@@ -24,4 +25,4 @@ export const givePanda: Query = {
 			],
 		},
 	],
-};
+});
