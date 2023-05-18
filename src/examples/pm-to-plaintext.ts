@@ -4,6 +4,20 @@ import { Query } from "../queries/query";
 export const ProseMirrorToPlaintext: Query = {
 	type: "context",
 	context: "clipboard",
+	// i put the join originally in the interpreter
+	// but the interpreter was being recursively called
+	// resulting in some strange object join encoding results
+	// putting it out here ensures post-recursion
+	join: {
+		// on: "object",
+		// key: {
+		// 	type: "context",
+		// 	context: "data",
+		// },
+		// delimiter: strToQuery(""),
+		on: "string",
+		delimiter: strToQuery(""),
+	},
 	dependents: [
 		{
 			type: "interpreter",

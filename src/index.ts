@@ -1,7 +1,8 @@
+import { ProseMirrorToPlaintext } from "./examples/pm-to-plaintext";
 import { throwError } from "./examples/throws-error";
 import { runQuery } from "./query-runner";
 
-const queryResult = runQuery({}, throwError);
+const queryResult = runQuery({}, ProseMirrorToPlaintext);
 
 queryResult.forEach((result) => {
 	console.log("RESULT");

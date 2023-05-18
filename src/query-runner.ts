@@ -55,7 +55,7 @@ export function runQuery(data: any, query: Query): any[] {
 
 	queryStack.pop();
 
-	return queryDependentResults;
+	return join(queryDependentResults, query);
 }
 
 function trySingleResultSubQuery(data: any, query: Query): any {
@@ -66,6 +66,45 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 	}
 
 	return queryResult[0];
+}
+
+function join(result: any[], query: Query): any[] {
+	if (!query.join) {
+		return result;
+	}
+
+	switch (query.join.on) {
+		case "array":
+			return result;
+		case "object":
+			const defaultKeyQuery = query.join.key;
+			return [
+				result.reduce((accum, entry) => {
+					const _for =
+						entry.key ||
+						trySingleResultSubQuery(entry, defaultKeyQuery);
+
+					if (typeof _for !== "string" && typeof _for !== "number") {
+						error(
+							"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+						);
+					}
+
+					return { ...accum, [_for]: entry };
+				}, {}),
+			];
+		case "string": {
+			const _for = trySingleResultSubQuery(result, query.join.delimiter);
+
+			if (_for && typeof _for !== "string") {
+				error(
+					"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+				);
+			}
+
+			return [result.join(_for)];
+		}
+	}
 }
 
 function error(message: string) {
@@ -226,7 +265,11 @@ function handleInterpreter(data: any, interpreter: QueryInterpreter): any[] {
 			// array means run everything over each dependent
 			switch (typeof data) {
 				case "string":
-					return [JSON.parse(data)];
+					try {
+						return [JSON.parse(data)];
+					} catch {
+						error("Couldn't parse data as object");
+					}
 				case "object":
 					return [data];
 				default:

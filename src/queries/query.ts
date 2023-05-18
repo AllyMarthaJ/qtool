@@ -11,7 +11,14 @@ export type Query = (
 	| QueryStackReference
 ) & {
 	dependents?: Query[];
+	join?: QueryJoin;
 };
+
+export type QueryJoin =
+	// Default key used for Query nodes which don't have a key
+	| { on: "object"; key: Query }
+	| { on: "array" }
+	| { on: "string"; delimiter: Query };
 
 export type QueryContext = { type: "context" } & (
 	| {
