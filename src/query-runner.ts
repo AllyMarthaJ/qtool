@@ -11,6 +11,9 @@ import clipboard from "copy-paste";
 
 export function runQuery(data: any, query: Query): any[] {
 	let queryResults: any[] = [];
+
+	const dependents = handleConditional(data, query);
+
 	switch (query.type) {
 		case "context":
 			queryResults = handleContext(data, query);
@@ -28,15 +31,15 @@ export function runQuery(data: any, query: Query): any[] {
 			queryResults = [handleDig(data, query)];
 			break;
 		case "conditional":
-			queryResults = [handleConditional(data, query)];
+			queryResults = dependents ? [data] : [];
 			break;
 	}
 
-	if (!query.dependents) {
+	if (!dependents) {
 		return queryResults;
 	}
 
-	return query.dependents
+	return dependents
 		.map((dependent) =>
 			queryResults.map((queryResult) => runQuery(queryResult, dependent))
 		)
@@ -53,17 +56,23 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 	return queryResult[0];
 }
 
-function handleConditional(data: any, condition: QueryCondition) {
-	const queryConditionalResult = runQuery(data, condition.query);
+function handleConditional(data: any, query: Query) {
+	if (query.type !== "conditional") {
+		return query.dependents;
+	}
 
-	if (queryConditionalResult.every((result) => !!result)) {
-		return data;
+	const queryConditionalResult = runQuery(data, query.query);
+
+	if (queryConditionalResult.some((result) => !!result)) {
+		return query.dependents;
+	} else {
+		return;
 	}
 }
 
 function handleFetch(data: any, fetch: QueryFetch) {
 	if (typeof data !== "object") {
-		throw "not an object";
+		return;
 	}
 
 	// implicit use case is arrays
