@@ -80,27 +80,42 @@ function join(result: any[], query: Query): any[] {
 	switch (query.join.on) {
 		case "array":
 			return result;
+		case "merge":
+			if (result.every((entry) => typeof entry === "object")) {
+				// result is [{...}, {...}, ...];
+				return [
+					result.reduce(
+						(accum, entry) => ({
+							...accum,
+							...entry,
+						}),
+						{}
+					),
+				];
+			} else if (result.every((entry) => Array.isArray(entry))) {
+				// result is [[...], [...], ...]
+				return result.reduce(
+					(accum, entry) => [...accum, ...entry],
+					[]
+				);
+			} else {
+				error("Not a consistent array or object.");
+				return [];
+			}
 		case "object":
 			const defaultKeyQuery = query.join.key;
-			const shouldSpread = query.join.spread;
 			return [
 				result.reduce((accum, entry) => {
-					if (shouldSpread) {
-						return { ...accum, ...entry };
-					} else {
-						const _for =
-							entry.key ||
-							trySingleResultSubQuery(entry, defaultKeyQuery);
-						if (
-							typeof _for !== "string" &&
-							typeof _for !== "number"
-						) {
-							error(
-								"Subquery returned an unkeyable result. Try reinterpreting it as a string."
-							);
-						}
-						return { ...accum, [_for]: entry };
+					const _for = trySingleResultSubQuery(
+						entry,
+						defaultKeyQuery
+					);
+					if (typeof _for !== "string" && typeof _for !== "number") {
+						error(
+							"Subquery returned an unkeyable result. Try reinterpreting it as a string."
+						);
 					}
+					return { ...accum, [_for]: entry };
 				}, {}),
 			];
 		case "string": {

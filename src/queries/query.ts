@@ -18,7 +18,8 @@ export type Query = (
 export type QueryJoin =
 	// Default key used for Query nodes which don't have a key
 	// if spread, don't key.
-	| { on: "object"; key: Query; spread?: boolean }
+	| { on: "merge" }
+	| { on: "object"; key: Query }
 	| { on: "array" }
 	| { on: "string"; delimiter: Query };
 

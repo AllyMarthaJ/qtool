@@ -18,9 +18,7 @@ export const ReleaseNoteQuery: Query = {
 					type: "fetch",
 					node: strToQuery("groups"),
 					join: {
-						on: "object",
-						key: strToQuery("panda"), // noop
-						spread: true,
+						on: "merge",
 					},
 					dependents: [
 						{
