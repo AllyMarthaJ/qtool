@@ -56,6 +56,8 @@ export type QueryInterpreter = {
 	interpreter: "string" | "generic";
 };
 
+// solution: [{ match: "...match...", groups: {0:...,1:...,2:....} }] if all
+// this way you can key index to name or something
 export type QueryGrep = {
 	type: "grep";
 	find: Query;

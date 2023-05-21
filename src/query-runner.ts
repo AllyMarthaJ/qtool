@@ -5,6 +5,7 @@ import {
 	QueryFetch,
 	QuerySed,
 	QueryInterpreter,
+	QueryGrep,
 } from "./queries/query";
 import clipboard from "copy-paste";
 
@@ -40,6 +41,9 @@ export function runQuery(data: any, query: Query): any[] {
 			const _query = queryStack[query.queryId ?? 0];
 
 			queryResults = runQuery(data, _query);
+			break;
+		case "grep":
+			queryResults = handleGrep(data, query);
 			break;
 	}
 
@@ -81,21 +85,22 @@ function join(result: any[], query: Query): any[] {
 			const shouldSpread = query.join.spread;
 			return [
 				result.reduce((accum, entry) => {
-					const _for =
-						entry.key ||
-						trySingleResultSubQuery(entry, defaultKeyQuery);
-
-					if (typeof _for !== "string" && typeof _for !== "number") {
-						if (shouldSpread) {
-							return { ...accum, ...entry };
-						} else {
+					if (shouldSpread) {
+						return { ...accum, ...entry };
+					} else {
+						const _for =
+							entry.key ||
+							trySingleResultSubQuery(entry, defaultKeyQuery);
+						if (
+							typeof _for !== "string" &&
+							typeof _for !== "number"
+						) {
 							error(
 								"Subquery returned an unkeyable result. Try reinterpreting it as a string."
 							);
 						}
+						return { ...accum, [_for]: entry };
 					}
-
-					return { ...accum, [_for]: entry };
 				}, {}),
 			];
 		case "string": {
@@ -158,9 +163,13 @@ function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	}
 
 	if (typeof data !== "object") {
-		// don't throw we might hit a string or something which
-		// is actually intentional
-		return;
+		// somewhat jank, but allow node sequences to
+		// assert on raw values too
+		if (data === dig.nodes[seqIndex]) {
+			return data;
+		} else {
+			return;
+		}
 	}
 
 	const _for = trySingleResultSubQuery(data, dig.nodes[seqIndex]);
@@ -197,6 +206,59 @@ function handleDig(data: any, dig: QueryDig, seqIndex = 0): any {
 	}
 }
 
+function handleGrep(data: any, grep: QueryGrep) {
+	if (typeof data === "string") {
+		const _find = trySingleResultSubQuery(data, grep.find);
+		const _flags = grep.flags
+			? trySingleResultSubQuery(data, grep.flags)
+			: "g";
+
+		if (typeof _find !== "string" || typeof _flags !== "string") {
+			error("Subquery returned an unusable result for greping with.");
+			return [];
+		}
+
+		const regex = new RegExp(_find, _flags);
+
+		let grepResult = [];
+		let result;
+		if (grep.all) {
+			console.log(regex);
+			while ((result = regex.exec(data)) !== null) {
+				const groups =
+					result.length > 0
+						? result.slice(1).reduce((accum, group, i) => {
+								return { ...accum, [`${i}`]: group };
+						  }, {})
+						: {};
+				grepResult.push({
+					match: result[0],
+					groups: groups,
+				});
+			}
+		} else {
+			const result = regex.exec(data);
+			if (result) {
+				const groups =
+					result.length > 0
+						? result.slice(1).reduce((accum, group, i) => {
+								return { ...accum, [`${i}`]: group };
+						  }, {})
+						: {};
+				grepResult.push({
+					match: result[0],
+					groups: groups,
+				});
+			}
+		}
+
+		return grepResult;
+	} else {
+		error("Can't grep a non-string. Try reinterpreting.");
+		return [];
+	}
+}
+
 function handleSed(data: any, sed: QuerySed) {
 	if (typeof data === "string") {
 		const _find = trySingleResultSubQuery(data, sed.find);
@@ -210,14 +272,14 @@ function handleSed(data: any, sed: QuerySed) {
 			typeof _repl !== "string" ||
 			typeof _flags !== "string"
 		) {
-			error("Subquery returned an unusable result for sedping with.");
+			error("Subquery returned an unusable result for sed'ing with.");
 		}
 
 		const regex = new RegExp(_find, _flags);
 
 		return data.replace(regex, _repl);
 	} else {
-		return "not a string";
+		error("Can't grep a non-string. Try reinterpreting.");
 	}
 }
 
