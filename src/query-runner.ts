@@ -14,10 +14,10 @@ const queryStack: Query[] = [];
 export function runQuery(data: any, query: Query): any[] {
 	let queryResults: any[] = [];
 
-	const dependents = handleConditional(data, query);
-
 	queryStack.push(query);
 
+	// Handle filter queries.
+	// These should never have a reference to their dependents.
 	switch (query.type) {
 		case "context":
 			queryResults = handleContext(data, query);
@@ -34,9 +34,6 @@ export function runQuery(data: any, query: Query): any[] {
 		case "dig":
 			queryResults = [handleDig(data, query)];
 			break;
-		case "conditional":
-			queryResults = dependents ? [data] : [];
-			break;
 		case "stack_query":
 			const _query = queryStack[query.queryId ?? 0];
 
@@ -44,6 +41,17 @@ export function runQuery(data: any, query: Query): any[] {
 			break;
 		case "grep":
 			queryResults = handleGrep(data, query);
+			break;
+	}
+
+	const dependents = handleConditional(data, query);
+
+	// Handle aggregate queries.
+	// An aggregate query will access its dependents.
+	switch (query.type) {
+		case "conditional":
+		case "join":
+			queryResults = dependents ? [data] : [];
 			break;
 	}
 
@@ -73,11 +81,11 @@ function trySingleResultSubQuery(data: any, query: Query): any {
 }
 
 function join(result: any[], query: Query): any[] {
-	if (!query.join) {
+	if (query.type !== "join") {
 		return result;
 	}
 
-	switch (query.join.on) {
+	switch (query.on) {
 		case "array":
 			return result;
 		case "merge":
@@ -103,7 +111,7 @@ function join(result: any[], query: Query): any[] {
 				return [];
 			}
 		case "object":
-			const defaultKeyQuery = query.join.key;
+			const defaultKeyQuery = query.key;
 			return [
 				result.reduce((accum, entry) => {
 					const _for = trySingleResultSubQuery(
@@ -119,7 +127,7 @@ function join(result: any[], query: Query): any[] {
 				}, {}),
 			];
 		case "string": {
-			const _for = trySingleResultSubQuery(result, query.join.delimiter);
+			const _for = trySingleResultSubQuery(result, query.delimiter);
 
 			if (_for && typeof _for !== "string") {
 				error(
@@ -305,6 +313,11 @@ function handleContext(data: any, context: QueryContext): any[] {
 		case "for_each":
 			if (Array.isArray(data)) {
 				return [...data];
+			} else if (typeof data === "object") {
+				return Object.entries(data).map(([k, v]) => ({
+					key: k,
+					value: v,
+				}));
 			} else {
 				error("Can't enumerate over non-array structure.");
 				return [];

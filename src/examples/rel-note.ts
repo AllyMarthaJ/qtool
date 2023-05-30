@@ -17,91 +17,117 @@ export const ReleaseNoteQuery: Query = {
 				{
 					type: "fetch",
 					node: strToQuery("groups"),
-					join: {
-						on: "merge",
-					},
 					dependents: [
 						{
-							type: "fetch",
-							node: strToQuery("0"),
-							join: {
-								// neat little trick; the result of this node will be
-								// { heading: "..." }
-								// as the dependents is a single value
-								on: "object",
-								key: strToQuery("heading"),
-							},
+							type: "join",
+							on: "merge",
 							dependents: [
 								{
-									type: "grep",
-									find: strToQuery(`<h3.*?>(.*?)</h3>`),
-									flags: strToQuery("g"),
+									type: "fetch",
+									node: strToQuery("0"),
 									dependents: [
 										{
-											type: "fetch",
-											node: strToQuery("groups"),
+											type: "join",
+											// neat little trick; the result of this node will be
+											// { heading: "..." }
+											// as the dependents is a single value
+											on: "object",
+											key: strToQuery("heading"),
 											dependents: [
 												{
-													type: "fetch",
-													node: strToQuery("0"),
+													type: "grep",
+													find: strToQuery(
+														`<h3.*?>(.*?)</h3>`
+													),
+													flags: strToQuery("g"),
+													dependents: [
+														{
+															type: "fetch",
+															node: strToQuery(
+																"groups"
+															),
+															dependents: [
+																{
+																	type: "fetch",
+																	node: strToQuery(
+																		"0"
+																	),
+																},
+															],
+														},
+													],
 												},
 											],
 										},
 									],
 								},
-							],
-						},
-						{
-							type: "fetch",
-							node: strToQuery("0"),
-							join: {
-								on: "object",
-								key: strToQuery("date"),
-							},
-							dependents: [
 								{
-									type: "grep",
-									find: strToQuery(
-										`<p class=".*?DateContainer.*?">(.*?)</p>`
-									),
-									flags: strToQuery("g"),
+									type: "fetch",
+									node: strToQuery("0"),
 									dependents: [
 										{
-											type: "fetch",
-											node: strToQuery("groups"),
+											type: "join",
+											on: "object",
+											key: strToQuery("date"),
 											dependents: [
 												{
-													type: "fetch",
-													node: strToQuery("0"),
+													type: "grep",
+													find: strToQuery(
+														`<p class=".*?DateContainer.*?">(.*?)</p>`
+													),
+													flags: strToQuery("g"),
+													dependents: [
+														{
+															type: "fetch",
+															node: strToQuery(
+																"groups"
+															),
+															dependents: [
+																{
+																	type: "fetch",
+																	node: strToQuery(
+																		"0"
+																	),
+																},
+															],
+														},
+													],
 												},
 											],
 										},
 									],
 								},
-							],
-						},
-						{
-							type: "fetch",
-							node: strToQuery("0"),
-							join: {
-								on: "object",
-								key: strToQuery("content"),
-							},
-							dependents: [
 								{
-									type: "grep",
-									find: strToQuery(
-										String.raw`<div class=".*?DescriptionContainer.*?>([\w\W]+?)</div>`
-									),
-									flags: strToQuery("g"),
+									type: "fetch",
+									node: strToQuery("0"),
 									dependents: [
 										{
-											type: "fetch",
-											node: strToQuery("groups"),
+											type: "join",
+											on: "object",
+											key: strToQuery("content"),
 											dependents: [
 												{
-													type: "fetch",
-													node: strToQuery("0"),
+													type: "grep",
+													find: strToQuery(
+														String.raw`<div class=".*?DescriptionContainer.*?>([\w\W]+?)</div>`
+													),
+													flags: strToQuery("g"),
+													dependents: [
+														{
+															type: "fetch",
+															node: strToQuery(
+																"groups"
+															),
+															dependents: [
+																{
+																	type: "fetch",
+																	node: strToQuery(
+																		"0"
+																	),
+																},
+															],
+														},
+													],
 												},
 											],
 										},

@@ -1,27 +1,36 @@
 // We can add node rules later. For example, a root should
 // have a context followed by interpreter or interpreters.
 // Each dependent signifies a separate output.
-export type Query = (
+export type Query = (AggregateQuery | FilterQuery) & {
+	dependents?: Query[];
+};
+
+/**
+ * Filter queries pass data down in a filtered context.
+ * They do not refer to their dependents.
+ */
+type FilterQuery =
 	| QueryContext
 	| QueryInterpreter
 	| QueryGrep
 	| QuerySed
 	| QueryFetch
 	| QueryDig
-	| QueryCondition
-	| QueryStackReference
-) & {
-	dependents?: Query[];
-	join?: QueryJoin;
-};
+	| QueryStackReference;
+
+/**
+ * Aggregate queries pass data up from their dependents
+ * allowing the result to be transformed.
+ */
+type AggregateQuery = QueryJoin | QueryCondition;
 
 export type QueryJoin =
 	// Default key used for Query nodes which don't have a key
 	// if spread, don't key.
-	| { on: "merge" }
-	| { on: "object"; key: Query }
-	| { on: "array" }
-	| { on: "string"; delimiter: Query };
+	| { type: "join"; on: "merge" }
+	| { type: "join"; on: "object"; key: Query }
+	| { type: "join"; on: "array" }
+	| { type: "join"; on: "string"; delimiter: Query };
 
 export type QueryContext = { type: "context" } & (
 	| {
