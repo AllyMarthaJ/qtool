@@ -27,10 +27,12 @@ type AggregateQuery = QueryJoin | QueryCondition;
 export type QueryJoin =
 	// Default key used for Query nodes which don't have a key
 	// if spread, don't key.
-	| { type: "join"; on: "merge" }
-	| { type: "join"; on: "object"; key: Query }
-	| { type: "join"; on: "array" }
-	| { type: "join"; on: "string"; delimiter: Query };
+	{ type: "join" } & (
+		| { on: "merge" }
+		| { on: "object"; key: Query }
+		| { on: "array" }
+		| { on: "string"; delimiter: Query }
+	);
 
 export type QueryContext = { type: "context" } & (
 	| {
